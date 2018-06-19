@@ -28,7 +28,7 @@ func (rh *RequestHandler) HandlerSend(c web.C, w http.ResponseWriter, r *http.Re
 		server.Write(w, protocols.InvalidParameterError)
 		return
 	}
-
+    log.WithFields(log.Fields{"SendRequest": request.ToValues()}).Info("Received SendRequest")
 	err = request.Validate()
 	if err != nil {
 		errorResponse := err.(*protocols.ErrorResponse)

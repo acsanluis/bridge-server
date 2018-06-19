@@ -15,7 +15,7 @@ var rootCmd *cobra.Command
 var migrateFlag bool
 var configFile string
 var versionFlag bool
-var version = "N/A"
+var version = "0.1 @acsanluis"
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())

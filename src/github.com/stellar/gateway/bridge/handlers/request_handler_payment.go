@@ -26,6 +26,7 @@ import (
 // Payment implements /payment endpoint
 func (rh *RequestHandler) Payment(w http.ResponseWriter, r *http.Request) {
 	request := &bridge.PaymentRequest{}
+
 	err := request.FromRequest(r)
 	if err != nil {
 		log.Error(err.Error())
@@ -65,7 +66,7 @@ func (rh *RequestHandler) complianceProtocolPayment(w http.ResponseWriter, reque
 
 	// Compliance server part
 	sendRequest := request.ToComplianceSendRequest()
-
+    log.WithFields(log.Fields{"sendRequest": sendRequest.ToValues()}).Info("Receive COMPLIANCE payment request")
 	resp, err := rh.Client.PostForm(
 		rh.Config.Compliance+"/send",
 		sendRequest.ToValues(),
@@ -101,6 +102,15 @@ func (rh *RequestHandler) complianceProtocolPayment(w http.ResponseWriter, reque
 		return
 	}
 
+	log.WithFields(log.Fields{"callbackSendResponse": callbackSendResponse}).Info("Compliance callbackSendResponse")
+	log.WithFields(log.Fields{"callbackSendResponse.AuthResponse": callbackSendResponse.AuthResponse}).Info("Compliance callbackSendResponse.AuthResponse")
+	log.WithFields(log.Fields{"callbackSendResponse.AuthResponse.InfoStatus": callbackSendResponse.AuthResponse.InfoStatus}).Info("Compliance callbackSendResponse.AuthResponse")
+	log.WithFields(log.Fields{"callbackSendResponse.AuthResponse.TxStatus": callbackSendResponse.AuthResponse.TxStatus}).Info("Compliance callbackSendResponse.AuthResponse")
+	log.WithFields(log.Fields{"callbackSendResponse.AuthResponse.DestInfo": callbackSendResponse.AuthResponse.DestInfo}).Info("Compliance callbackSendResponse.AuthResponse")
+	log.WithFields(log.Fields{"callbackSendResponse.AuthResponse.Pending": callbackSendResponse.AuthResponse.Pending}).Info("Compliance callbackSendResponse.AuthResponse")
+	log.WithFields(log.Fields{"callbackSendResponse.AuthResponse.Error": callbackSendResponse.AuthResponse.Error}).Info("Compliance callbackSendResponse.AuthResponse")
+
+	log.WithFields(log.Fields{"callbackSendResponse.TransactionXdr": callbackSendResponse.TransactionXdr}).Info("Compliance callbackSendResponse.TransactionXdr")
 	if callbackSendResponse.AuthResponse.InfoStatus == compliance.AuthStatusPending ||
 		callbackSendResponse.AuthResponse.TxStatus == compliance.AuthStatusPending {
 		log.WithFields(log.Fields{"response": callbackSendResponse}).Info("Compliance response pending")
@@ -134,6 +144,7 @@ func (rh *RequestHandler) complianceProtocolPayment(w http.ResponseWriter, reque
 }
 
 func (rh *RequestHandler) standardPayment(w http.ResponseWriter, request *bridge.PaymentRequest) {
+    log.WithFields(log.Fields{"request": request.ToValues()}).Info("Receive STANDARD payment request")
 	var paymentID *string
 
 	if request.ID != "" {
